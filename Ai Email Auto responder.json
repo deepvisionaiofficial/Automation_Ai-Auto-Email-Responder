@@ -1,0 +1,464 @@
+{
+  "name": "Ai Email Auto responder",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "sender": "-from:moeeznisar113@gmail.com"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -1376,
+        -32
+      ],
+      "id": "9bb114b2-d561-4ef6-b781-1b7643188c1f",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "D6HfOKr0vcUawkgF",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8a2b3ee0-3f68-4ffc-87ce-d8021a8e0215",
+              "leftValue": "={{ $json.text }} ",
+              "rightValue": "Spam",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -688,
+        -336
+      ],
+      "id": "541100b3-291a-4a79-a48c-0c2be2f9f74d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "84ad349c-6df1-4e16-aa33-7c3daf13a280",
+              "leftValue": "={{ $json.action }}",
+              "rightValue": "draft",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        16,
+        -32
+      ],
+      "id": "51be9e02-f4cc-4041-9f84-8c93deaba6b0",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "=Re: {{ $('Gmail Trigger').item.json.Subject }}",
+        "emailType": "html",
+        "message": "={{ $('Code in JavaScript').item.json.response }}",
+        "options": {
+          "threadId": "={{ $('Gmail Trigger').item.json.threadId }}",
+          "sendTo": "={{ $('Gmail Trigger').item.json.From.match(/<(.+)>/)?.[1] || $('Gmail Trigger').item.json.From }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        192,
+        -304
+      ],
+      "id": "ad30b99d-40e4-435a-b29a-f486837a3ff2",
+      "name": "Create a draft",
+      "webhookId": "c0e72f4b-c316-42f6-a15e-0b1bd6ec9877",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "D6HfOKr0vcUawkgF",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "message": "={{ $('Code in JavaScript').item.json.response }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        192,
+        160
+      ],
+      "id": "333dfb8d-c8a8-4199-a435-0d10783260f6",
+      "name": "Reply to a message",
+      "webhookId": "dda2dece-6715-473c-b2bc-f26eaf26a286",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "D6HfOKr0vcUawkgF",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "moeeznisar113@gmail.com",
+        "subject": "Auto-Reply Sent Notification",
+        "message": "=An auto-reply has been sent successfully.<br><br>\nCategory: {{ $('Code in JavaScript').item.json.category }}<br>\nTime: {{ $now.setZone('Asia/Karachi').toFormat('dd LLL yyyy, hh:mm a') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        160
+      ],
+      "id": "26eb99c7-6f2a-4409-890e-92db44b090b5",
+      "name": "Send a message",
+      "webhookId": "d0cd85ec-3b3f-4ca4-a98a-13467b7b5a03",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "D6HfOKr0vcUawkgF",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "moeeznisar113@gmail.com",
+        "subject": "Draft Reply Created - Review Needed",
+        "message": "=An auto-reply/draft has been created successfully.<br><br>\nCategory: {{ $('Code in JavaScript').item.json.category }}<br>\nTime: {{ $now.setZone('Asia/Karachi').toFormat('dd LLL yyyy, hh:mm a') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        -304
+      ],
+      "id": "573d6dc5-4bb8-4e33-b864-b095d36a8f94",
+      "name": "Send a message1",
+      "webhookId": "01cd3ef2-f9c7-4e10-841a-52051d133ee4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "D6HfOKr0vcUawkgF",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawOutput = $input.first().json.text;\nlet category = \"General\";\nlet action = \"send\";\nlet response = rawOutput;\ntry {\n  const cleaned = rawOutput.replace(/```json|```/g, \"\").trim();\n  const parsed = JSON.parse(cleaned);\n  category = (parsed.category || \"General\").trim();\n  action = (parsed.action || \"send\").trim().toLowerCase();\n  response = (parsed.response || rawOutput).replace(/\\n/g, \"<br>\");\n} catch (error) {\n  response = rawOutput.replace(/\\n/g, \"<br>\");\n}\nreturn [{ json: { category, action, response } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -192,
+        -32
+      ],
+      "id": "0b773f9f-18f1-40f2-92d2-569bb3a9ae98",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3414c573-ee10-41f8-b3fc-a5c12ff525af",
+              "leftValue": "{{ $('Gmail Trigger').item.json.From }}",
+              "rightValue": "moeeznisar113@gmail.com",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -896,
+        -32
+      ],
+      "id": "3931ba47-9107-4817-81f6-553a7bd2f127",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -1184,
+        208
+      ],
+      "id": "bd767058-4e0f-4e24-b15b-c6747e32e301",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "JPLTKIMoQH8eW8ye",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -512,
+        192
+      ],
+      "id": "dcacb4c8-ac40-4ede-bfee-3cf187ec0624",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "JPLTKIMoQH8eW8ye",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an email classification assistant.\nClassify the following email into exactly one of these categories: Spam, Urgent, General, Support, Sales, Complaint, Meeting.\n\nEmail Subject: {{ $json.Subject }}\nEmail Body: {{ $json.snippet }}\n\nReturn ONLY the category name, nothing else. No explanation, no punctuation, no extra text.",
+        "messages": {
+          "messageValues": []
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -1184,
+        -32
+      ],
+      "id": "505f022a-3997-4c37-a24c-972e11d395be",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a professional customer support agent responding to emails on behalf of a company.\nRead the customer's email below and write a natural, human-sounding reply addressing their specific request.\n\nEmail Subject: {{ $('Gmail Trigger').item.json.Subject }}\nEmail Body: {{ $('Gmail Trigger').item.json.snippet }}\nCategory: {{ $('Basic LLM Chain').item.json.text }}\n\nRules for deciding \"action\":\n- Set action to \"draft\" if the email involves ANY of the following:\n  - A meeting invitation, meeting link (Zoom, Google Meet, Teams), or scheduled call\n  - Complaints, refunds, billing disputes, or account issues\n  - Angry/frustrated tone, escalations, or legal concerns\n  - Anything requiring a personal decision from the account owner\n- Set action to \"send\" ONLY for simple, routine, informational questions with no meeting, \n  financial, or complaint element.\n- If unsure, always choose \"draft\".\n\nRules for the reply text:\n- If the email contains a meeting invitation or meeting link, do NOT write a reply to the \n  sender. Instead, set response to ONLY this short internal note: \n  \"This email contains a meeting request that needs your personal review before responding.\"\n- For all other draft-worthy emails (complaints, refunds, etc.) and all \"send\" emails, \n  write the full human-sounding reply using these rules:\n  - Structure with a greeting, 1-2 short body paragraphs, and a closing line.\n  - Never mention AI, automation, n8n, or bots.\n  - Never use \"auto-reply\", \"draft\", or \"category\" inside the reply text.\n  - Sign off with \"Best regards,\\nMoeez Nisar\" — never use placeholders.\n  - Use \\n\\n between sections.\n\nReturn ONLY valid JSON in this exact format, with no extra text:\n{\"category\": \"<category>\", \"action\": \"<draft or send>\", \"response\": \"<reply text or internal note>\"}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -512,
+        -32
+      ],
+      "id": "7637833d-c049-49e2-bc03-1b49f538ee95",
+      "name": "Basic LLM Chain1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Create a draft",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to a message": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a draft": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "V2nboAeFSr05FwVF",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "052af2c4-7d6a-4ae6-8aa5-5a8f2247fe6b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "77131c1feb861db34783adc0eea49cb8b37f664bb05efd223c0baf5650a84082"
+  },
+  "nodeGroups": [],
+  "id": "mEsIjY9qD4HzjH9A",
+  "tags": []
+}

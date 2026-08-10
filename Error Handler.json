@@ -1,0 +1,67 @@
+{
+  "name": "Error Handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8b35b999-f4a1-4b53-aa7c-ddb344db04d4",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "sendTo": "moeeznisar113@gmail.com",
+        "subject": "⚠️ Ai Email Auto Responder - Workflow Failed",
+        "message": "=An error occurred in the Ai Email Auto Responder workflow.<br><br>\nWorkflow: {{ $json.workflow.name }}<br>\nFailed Node: {{ $json.execution.lastNodeExecuted }}<br>\nError Message: {{ $json.execution.error.message }}<br>\nTime: {{ $now.setZone('Asia/Karachi').toFormat('dd LLL yyyy, hh:mm a') }}<br><br>\nPlease check n8n immediately to resolve the issue.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "601f1000-873f-4746-a7b2-a9df32d6e429",
+      "name": "Send a message",
+      "webhookId": "65bdae73-ac54-406a-8ca2-7649722133d7",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "D6HfOKr0vcUawkgF",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "dcffd996-c4d6-45f3-8214-19789931130c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "77131c1feb861db34783adc0eea49cb8b37f664bb05efd223c0baf5650a84082"
+  },
+  "nodeGroups": [],
+  "id": "V2nboAeFSr05FwVF",
+  "tags": []
+}
